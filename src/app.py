@@ -1,13 +1,14 @@
 from __future__ import absolute_import, unicode_literals
-import os
 
 from flask import Flask
+
+from decouple import config
 
 from urls import all_urls
 
 
-application = Flask(os.environ.get("APPLICATION_NAME"))
-SETTINGS_FILE = os.environ.get("SETTINGS_FILE", "settings.local")
+application = Flask(config("APPLICATION_NAME"))
+SETTINGS_FILE = config("SETTINGS_FILE", default="settings.local1")
 
 application.config.from_object(SETTINGS_FILE)
 

@@ -1,6 +1,6 @@
 from sqlalchemy_utils import URLType
 
-from database import db
+from app import db
 
 
 class PageWordCount(db.Model):

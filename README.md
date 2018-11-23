@@ -9,3 +9,9 @@ Steps to run this project:
 - Set `FLASK_APP` environment variable to `app.py` [For Linux: `export FLASK_APP=app.py`]
 - Go into source directory [`cd src/`]
 - Run `flask run`
+
+
+Steps to run background task worker:
+
+- Start redis [`redis-server`]
+- [`rqworker`]

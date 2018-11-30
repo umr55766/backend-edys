@@ -1,5 +1,3 @@
-from collections import OrderedDict
-
 from flask import Flask, jsonify
 from flask import request
 
@@ -8,7 +6,9 @@ from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
 from flask_rq2 import RQ
 from flask_sqlalchemy import SQLAlchemy
+from rq import Connection, Queue, Worker
 from sqlalchemy_utils import URLType
+import redis
 import requests
 
 
@@ -101,3 +101,24 @@ def get_serialized_data(object, start, limit, serializer_class):
     objects = objects[(start - 1):(start - 1 + limit)]
     serializer = serializer_class.dump(objects)
     return serializer.data
+
+
+@application.route("/tasks/<task_id>", methods=['GET',])
+def task_details_view(task_id):
+    with Connection(redis.from_url(config('REDIS_URL'))):
+        queue = Queue()
+        task = queue.fetch_job(task_id)
+
+    if task:
+        response = {
+            'status': 'success',
+            'data': {
+                'task_id': task.get_id(),
+                'task_status': task.get_status(),
+                'task_result': task.result,
+            }
+        }
+    else:
+        response = {'status': 'error'}
+
+    return jsonify(response)

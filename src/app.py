@@ -7,12 +7,7 @@ from flask_rq2 import RQ
 from sqlalchemy_utils import URLType
 
 application = Flask(config("APPLICATION_NAME"))
-SETTINGS_FILE = config("SETTINGS_FILE", "settings/local.py")
-
-# TODO : Needs to be investigated and fixed
-# rqworker : __file__ = ./src/app.py
-# flask run : __file__ = /Users/umair/workspace/edyst/backend-edys/src/app.py
-SETTINGS_FILE = ("src/" if __file__[0] == "." else "") + SETTINGS_FILE
+SETTINGS_FILE = config("SETTINGS_FILE", "settings/local.py", cast=str)
 
 application.config.from_pyfile(SETTINGS_FILE)
 
@@ -24,6 +19,7 @@ rq = RQ(application)
 @rq.job
 def add(x, y):
     return x + y
+
 
 @application.route("/")
 def index():

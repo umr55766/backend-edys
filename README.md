@@ -13,5 +13,5 @@ Steps to run this project:
 
 Steps to run background task worker:
 
-- Start redis [`redis-server`]
-- [`rqworker`]
+- First we need to start the redis [`redis-server`]
+- Then start rqworker which will consume the queued tasks and process them [`flask rq worker`]

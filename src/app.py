@@ -6,11 +6,12 @@ from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
 from flask_rq2 import RQ
 from flask_sqlalchemy import SQLAlchemy
-from rq import Connection, Queue, Worker
+from rq import Connection, Queue
 from sqlalchemy_utils import URLType
 import redis
 import requests
 
+from src.utils import get_paginated_list
 
 application = Flask(config("APPLICATION_NAME"))
 SETTINGS_FILE = config("SETTINGS_FILE", "settings/local.py", cast=str)
@@ -41,7 +42,9 @@ def index():
                 model=PageWordCount,
                 url=request.base_url,
                 start=int(request.args.get('start', 1)),
-                limit=int(request.args.get('limit', 20)))
+                limit=int(request.args.get('limit', 20)),
+                serializer=page_word_counts_serializer,
+            )
         )
 
     url = request.args.get('url')
@@ -62,45 +65,6 @@ class PageWordCountSerializer(ma.Schema):
 
 page_word_count_serializer = PageWordCountSerializer()
 page_word_counts_serializer = PageWordCountSerializer(many=True)
-
-
-def get_paginated_list(model, url, start, limit):
-    count = model.query.count()
-    if count < start:
-        return {"error": "invalid page"}
-
-    return {
-        'start': start,
-        'limit': limit,
-        'count': count,
-        'previous': get_previous_url(start, limit, url),
-        'next': get_next_url(start, limit, count, url),
-        'results': get_serialized_data(model, start, limit, page_word_counts_serializer)
-    }
-
-
-def get_next_url(start, limit, count, url):
-    if start + limit > count:
-        return None
-    else:
-        start_copy = start + limit
-        return url + '?start=%d&limit=%d' % (start_copy, limit)
-
-
-def get_previous_url(start, limit, url):
-    if start == 1:
-        return None
-    else:
-        start_copy = max(1, start - limit)
-        limit_copy = start - 1
-        return url + '?start=%d&limit=%d' % (start_copy, limit_copy)
-
-
-def get_serialized_data(object, start, limit, serializer_class):
-    objects = object.query.all()
-    objects = objects[(start - 1):(start - 1 + limit)]
-    serializer = serializer_class.dump(objects)
-    return serializer.data
 
 
 @application.route("/tasks/<task_id>", methods=['GET',])

@@ -4,6 +4,7 @@ from decouple import config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_rq2 import RQ
+from sqlalchemy_utils import URLType
 
 application = Flask(config("APPLICATION_NAME"))
 SETTINGS_FILE = config("SETTINGS_FILE", "settings/local.py")
@@ -29,3 +30,9 @@ def index():
     add.queue(1, 1)
     # from .tasks import add
     return "Welcome!"
+
+
+class PageWordCount(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    url = db.Column(URLType)
+    word_count = db.Column(db.Integer)

@@ -47,7 +47,10 @@ def index():
             )
         )
 
-    url = request.args.get('url')
+    if not request.get_json(force=True) or "url" not in request.get_json(force=True):
+        return jsonify({"url": "is required"})
+
+    url = request.get_json().get('url')
     task = count_words_task.queue(url)
     return jsonify({"task_id": task.id})
 

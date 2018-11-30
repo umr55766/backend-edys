@@ -35,9 +35,13 @@ def count_words_task(url):
 @application.route("/", methods=['GET', 'POST'])
 def index():
     if request.method == "GET":
-        page_word_counts = PageWordCount.query.all()
-        serializer = page_word_counts_serializer.dump(page_word_counts)
-        return jsonify(serializer.data)
+        return jsonify(
+            get_paginated_list(
+                model=PageWordCount,
+                url="/",
+                start=int(request.args.get('start', 1)),
+                limit=int(request.args.get('limit', 20)))
+        )
 
     url = request.args.get('url')
     task = count_words_task.queue(url)
@@ -57,3 +61,42 @@ class PageWordCountSerializer(ma.Schema):
 
 page_word_count_serializer = PageWordCountSerializer()
 page_word_counts_serializer = PageWordCountSerializer(many=True)
+
+
+def get_paginated_list(model, url, start, limit):
+    count = model.query.count()
+    if count < start:
+        return {"error": "invalid page"}
+
+    return {
+        'start': start,
+        'limit': limit,
+        'count': count,
+        'previous': get_previous_url(start, limit, url),
+        'next': get_next_url(start, limit, count, url),
+        'results': get_serialized_data(model, start, limit, page_word_counts_serializer)
+    }
+
+
+def get_next_url(start, limit, count, url):
+    if start + limit > count:
+        return None
+    else:
+        start_copy = start + limit
+        return url + '?start=%d&limit=%d' % (start_copy, limit)
+
+
+def get_previous_url(start, limit, url):
+    if start == 1:
+        return None
+    else:
+        start_copy = max(1, start - limit)
+        limit_copy = start - 1
+        return url + '?start=%d&limit=%d' % (start_copy, limit_copy)
+
+
+def get_serialized_data(object, start, limit, serializer_class):
+    objects = object.query.all()
+    objects = objects[(start - 1):(start - 1 + limit)]
+    serializer = serializer_class.dump(objects)
+    return serializer.data

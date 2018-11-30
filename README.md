@@ -1,8 +1,11 @@
 # Exposed APIs:
 
 - API to list of all submitted urls : GET request to index url `/`
+  - Example : curl --request GET --url 'http://127.0.0.1:5000/?limit=5'  --header 'Content-Type: application/javascript'
 - API to submit a url : POST request to index url `/`
+  - Example : curl --request POST --url http://127.0.0.1:5000/ --header 'Content-Type: application/javascript' --data '{\n    "url": "https://umair.surge.sh"\n}'
 - API to check status of background task : GET request to `/tasks/<task_id>`
+  - Example : curl --request GET --url http://127.0.0.1:5000/tasks/5f19ef59-81a2-46af-a104-2ccc6d087029
 
 ### Workflow:
 
@@ -25,5 +28,6 @@
 
 #### Steps to run background task worker:
 
+- Set `FLASK_APP` environment variable to `app.py` [For Linux: `export FLASK_APP=app.py`]
 - First we need to start the redis [`redis-server`]
 - Then start rqworker which will consume the queued tasks and process them [`flask rq worker`]

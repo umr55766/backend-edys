@@ -1,4 +1,4 @@
-import requests
+from collections import OrderedDict
 
 from flask import Flask, jsonify
 from flask import request
@@ -9,6 +9,7 @@ from flask_migrate import Migrate
 from flask_rq2 import RQ
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy_utils import URLType
+import requests
 
 
 application = Flask(config("APPLICATION_NAME"))
@@ -26,7 +27,7 @@ ma = Marshmallow(application)
 def count_words_task(url):
     response = requests.get(url)
     if response.status_code == 200:
-        page_word_count = PageWordCount(url=url, word_count=len(str(response.content).split(" ")))
+        page_word_count = PageWordCount(url=url, word_count=len(response.text.split()))
         db.session.add(page_word_count)
         db.session.commit()
         print("Saved successfully")
@@ -38,7 +39,7 @@ def index():
         return jsonify(
             get_paginated_list(
                 model=PageWordCount,
-                url="/",
+                url=request.base_url,
                 start=int(request.args.get('start', 1)),
                 limit=int(request.args.get('limit', 20)))
         )

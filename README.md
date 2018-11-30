@@ -13,7 +13,7 @@
 - You'll get the background task_id in response
 - You can check the background task status by making GET request to `/tasks/<task_id>`
 - To get the results you can make GET request to `/` index url
-   -  This API supports pagination. Client can control page size by sending page size in query params with `limit` as key
+   -  **_This API supports pagination. Client can control page size by sending page size in query params with `limit` as key_**
 
 
 #### Steps to run this project:

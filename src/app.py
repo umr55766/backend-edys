@@ -1,4 +1,7 @@
+import requests
+
 from flask import Flask
+from flask import request
 
 from decouple import config
 from flask_sqlalchemy import SQLAlchemy
@@ -17,15 +20,20 @@ rq = RQ(application)
 
 
 @rq.job
-def add(x, y):
-    return x + y
+def count_words_task(url):
+    response = requests.get(url)
+    if response.status_code == 200:
+        page_word_count = PageWordCount(url=url, word_count=len(str(response.content).split(" ")))
+        db.session.add(page_word_count)
+        db.session.commit()
+        print("Saved successfully")
 
 
 @application.route("/")
 def index():
-    add.queue(1, 1)
-    # from .tasks import add
-    return "Welcome!"
+    url = request.args.get('url')
+    count_words_task.queue(url)
+    return count_words_task.queue(url).id
 
 
 class PageWordCount(db.Model):

@@ -1,6 +1,10 @@
+from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy_utils import URLType
 
-from app import db
+
+db = SQLAlchemy()
+migrate = Migrate()
 
 
 class PageWordCount(db.Model):

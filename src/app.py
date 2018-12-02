@@ -1,91 +1,23 @@
 from flask import Flask, jsonify
-from flask import request
 
 from decouple import config
-from flask_marshmallow import Marshmallow
-from flask_migrate import Migrate
-from flask_rq2 import RQ
-from flask_sqlalchemy import SQLAlchemy
-from rq import Connection, Queue
-from sqlalchemy_utils import URLType
-import redis
-import requests
-
-from src.utils import get_paginated_list
-
-application = Flask(config("APPLICATION_NAME"))
-SETTINGS_FILE = config("SETTINGS_FILE", "settings/local.py", cast=str)
-
-application.config.from_pyfile(SETTINGS_FILE)
-
-db = SQLAlchemy(application)
-migrate = Migrate(application, db)
-rq = RQ(application)
-ma = Marshmallow(application)
 
 
-@rq.job
-def count_words_task(url):
-    response = requests.get(url)
-    if response.status_code == 200:
-        page_word_count = PageWordCount(url=url, word_count=len(response.text.split()))
-        db.session.add(page_word_count)
-        db.session.commit()
-        print("Saved successfully")
+def create_app():
+    application = Flask(config("APPLICATION_NAME"))
+    application.config.from_pyfile(config("SETTINGS_FILE", "settings/local.py", cast=str))
 
+    from .models import db, migrate
+    db.init_app(application)
+    migrate.init_app(application, db)
 
-@application.route("/", methods=['GET', 'POST'])
-def index():
-    if request.method == "GET":
-        return jsonify(
-            get_paginated_list(
-                model=PageWordCount,
-                url=request.base_url,
-                start=int(request.args.get('start', 1)),
-                limit=int(request.args.get('limit', 20)),
-                serializer=page_word_counts_serializer,
-            )
-        )
+    from .serializers import ma
+    ma.init_app(application)
 
-    if not request.get_json(force=True) or "url" not in request.get_json(force=True):
-        return jsonify({"url": "is required"})
+    from .tasks import rq
+    rq.init_app(application)
 
-    url = request.get_json().get('url')
-    task = count_words_task.queue(url)
-    return jsonify({"task_id": task.id})
+    from .views import api_views
+    application.register_blueprint(api_views)
 
-
-class PageWordCount(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    url = db.Column(URLType)
-    word_count = db.Column(db.Integer)
-
-
-class PageWordCountSerializer(ma.Schema):
-    class Meta:
-        fields = ('id', 'url', 'word_count')
-
-
-page_word_count_serializer = PageWordCountSerializer()
-page_word_counts_serializer = PageWordCountSerializer(many=True)
-
-
-@application.route("/tasks/<task_id>", methods=['GET',])
-def task_details_view(task_id):
-    with Connection(redis.from_url(config('REDIS_URL'))):
-        queue = Queue()
-        task = queue.fetch_job(task_id)
-
-    if task:
-        response = {
-            'status': 'success',
-            'data': {
-                'task_id': task.get_id(),
-                'task_status': task.get_status(),
-                'task_result': task.result,
-            }
-        }
-    else:
-        response = {'status': 'error'}
-
-    return jsonify(response)
+    return application

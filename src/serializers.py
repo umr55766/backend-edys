@@ -1,4 +1,7 @@
-from app import ma
+from flask_marshmallow import Marshmallow
+
+
+ma = Marshmallow()
 
 
 class PageWordCountSerializer(ma.Schema):

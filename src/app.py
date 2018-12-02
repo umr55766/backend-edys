@@ -20,4 +20,8 @@ def create_app():
     from .views import api_views
     application.register_blueprint(api_views)
 
+    from .commands import CLI_COMMANDS
+    for cli_name, cli_command in CLI_COMMANDS.items():
+        application.cli.add_command(cli_command, name=cli_name)
+
     return application

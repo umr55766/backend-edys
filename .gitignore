@@ -21,5 +21,5 @@ htmlcov/
 .coverage
 .coverage.*
 *,cover
-local.db
+*.db
 dump.rdb

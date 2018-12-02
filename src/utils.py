@@ -1,6 +1,6 @@
 def get_paginated_list(model, url, start, limit, serializer):
     count = model.query.count()
-    if count < start:
+    if start > count != 0:
         return {"error": "invalid page"}
 
     return {

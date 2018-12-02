@@ -23,9 +23,17 @@
 - Go into root directory [`cd backend-edys/`]
 - Install the requirements [`pip install -r requirements.txt`]
 - Set `FLASK_APP` environment variable to `app.py` [For Linux: `export FLASK_APP=app.py`]
+- Copy/Rename `.env.example` to `.env`, replace all dummy values to your real values
 - Go into source directory [`cd src/`]
 - Run `flask run`
 
+
+#### Steps to setup database
+- We need to initialize the database, for that we have defined a custom cli command [`flask initdb`]
+
+[NOT NEEDED IN SETUP]
+- Create migration file : `flask db migrate`
+- Migrate database : `flask db upgrade`
 
 #### Steps to run background task worker:
 
@@ -42,6 +50,12 @@
 - redis : Background task backend/storage
 - requests : HTTP Client
 - flask-marshmallow : Serializer
+
+#### API Parameters:
+
+- `limit` : Page size (default: 20)
+- `start` : Starting point of the cursor (default : 1)
+
 
 **Sample API response**
 ```{

@@ -1,11 +1,16 @@
 $(document).ready( function () {
     var trigger = null;
+    var backoff = 2;
 
     var table = $('#datatable').DataTable({
         "ajax": {
             "url": "api/datatable?limit=1000",
             "error": function (data) {
                 clearInterval(trigger);
+                trigger = setInterval( function () {
+                    table.ajax.reload( null, false);
+                }, backoff*1000 );
+                backoff *= 2;
             }
         },
         "order": [[ 0, "desc" ]]

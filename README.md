@@ -63,8 +63,8 @@
   "start": 6,
   "limit": 5,
   "count": 16,
-  "previous": "http://127.0.0.1:5000/?start=1&limit=5",
-  "next": "http://127.0.0.1:5000/?start=11&limit=5",
+  "previous": "http://127.0.0.1:5000/api/list?start=1&limit=5",
+  "next": "http://127.0.0.1:5000/api/list?start=11&limit=5",
   "results": [
     {
       "id": 6,

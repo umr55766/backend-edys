@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, render_template
 
 from decouple import config
 from rq import Connection, Queue
@@ -7,9 +7,22 @@ import redis
 from .models import PageWordCount
 from .serializers import page_word_counts_serializer
 from .tasks import count_words_task
-from .utils import get_paginated_list
+from .utils import get_paginated_list, get_serialized_data
 
 api_views = Blueprint('api', __name__, url_prefix='/api')
+html_views = Blueprint('html', __name__)
+
+
+@api_views.route("/datatable", methods=['GET', ])
+def datatable_data():
+    return jsonify(
+        {
+            "data": [[obj["id"], obj["url"], obj["word_count"]] for obj in get_serialized_data(
+                object=PageWordCount,
+                start=1,
+                limit=int(request.args.get("limit", 1000)),
+                serializer_class=page_word_counts_serializer)]
+        })
 
 
 @api_views.route("/list", methods=['GET', 'POST'])
@@ -52,3 +65,8 @@ def task_details_view(task_id):
         response = {'status': 'error'}
 
     return jsonify(response)
+
+
+@html_views.route("/", methods=["GET", ])
+def index_view():
+    return render_template('index.html', page_word_counts = PageWordCount.query.all())

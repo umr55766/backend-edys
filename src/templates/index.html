@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Index{% endblock %}
+{{ super() }}
+{% block content %}
+    <div id="form">
+        <input type="text" id="url_input_box" placeholder="Enter new url here"/>
+        <button onclick="submit_url()">Submit</button>
+    </div>
+    <table id="datatable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>URL</th>
+                <th>Word Count</th>
+            </tr>
+        </thead>
+    </table>
+{% endblock %}

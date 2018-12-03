@@ -20,8 +20,9 @@ def create_app(TEST=False):
     from .tasks import rq
     rq.init_app(application)
 
-    from .views import api_views
+    from .views import api_views, html_views
     application.register_blueprint(api_views)
+    application.register_blueprint(html_views)
 
     from .commands import CLI_COMMANDS
     for cli_name, cli_command in CLI_COMMANDS.items():

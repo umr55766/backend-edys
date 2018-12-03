@@ -1,0 +1,14 @@
+<!doctype html>
+<html>
+  <head>
+    {% block head %}
+      {% include "cdns.html" %}
+      <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+      <script src="{{ url_for('static', filename='script.js') }}" ></script>
+      <title>{% block title %}{% endblock %} - My Webpage</title>
+    {% endblock %}
+  </head>
+  <body>
+    <div id="content">{% block content %}{% endblock %}</div>
+  </body>
+</html>

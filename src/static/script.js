@@ -1,10 +1,17 @@
 $(document).ready( function () {
-    var table = $('#datatable').DataTable({
-        "ajax": "api/datatable?limit=1000",
-        "order": [[ 0, "desc" ]]
-     })
+    var trigger = null;
 
-    setInterval( function () {
+    var table = $('#datatable').DataTable({
+        "ajax": {
+            "url": "api/datatable?limit=1000",
+            "error": function (data) {
+                clearInterval(trigger);
+            }
+        },
+        "order": [[ 0, "desc" ]]
+     });
+
+    trigger = setInterval( function () {
         table.ajax.reload( null, false);
     }, 1000 );
 });

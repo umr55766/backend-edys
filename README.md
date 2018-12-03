@@ -1,18 +1,18 @@
 # Exposed APIs:
 
-- API to list of all submitted urls : GET request to index url `/`
-  - Example : curl --request GET --url 'http://127.0.0.1:5000/?limit=5'  --header 'Content-Type: application/javascript'
-- API to submit a url : POST request to index url `/`
-  - Example : curl --request POST --url http://127.0.0.1:5000/ --header 'Content-Type: application/javascript' --data '{\n    "url": "https://umair.surge.sh"\n}'
-- API to check status of background task : GET request to `/tasks/<task_id>`
-  - Example : curl --request GET --url http://127.0.0.1:5000/tasks/5f19ef59-81a2-46af-a104-2ccc6d087029
+- API to list of all submitted urls : GET request to index url `/api/list`
+  - Example : curl --request GET --url 'http://127.0.0.1:5000/api/list?limit=5'  --header 'Content-Type: application/javascript'
+- API to submit a url : POST request to index url `/api/list`
+  - Example : curl --request POST --url http://127.0.0.1:5000/api/list --header 'Content-Type: application/javascript' --data '{\n    "url": "https://umair.surge.sh"\n}'
+- API to check status of background task : GET request to `/api/tasks/<task_id>`
+  - Example : curl --request GET --url http://127.0.0.1:5000/api/tasks/5f19ef59-81a2-46af-a104-2ccc6d087029
 
 ### Workflow:
 
-- Make a POST request to `/` index url with your url in body with the key `url`
+- Make a POST request to `/api/list` index url with your url in body with the key `url`
 - You'll get the background task_id in response
-- You can check the background task status by making GET request to `/tasks/<task_id>`
-- To get the results you can make GET request to `/` index url
+- You can check the background task status by making GET request to `/api/tasks/<task_id>`
+- To get the results you can make GET request to `/api/list` index url
    -  **_This API supports pagination. Client can control page size by sending page size in query params with `limit` as key_**
 
 
@@ -50,6 +50,7 @@
 - redis : Background task backend/storage
 - requests : HTTP Client
 - flask-marshmallow : Serializer
+- sqlalchemy_utils : Use url field in model
 
 #### API Parameters:
 
@@ -62,8 +63,8 @@
   "start": 6,
   "limit": 5,
   "count": 16,
-  "previous": "http://127.0.0.1:5000/?start=1&limit=5",
-  "next": "http://127.0.0.1:5000/?start=11&limit=5",
+  "previous": "http://127.0.0.1:5000/api/list?start=1&limit=5",
+  "next": "http://127.0.0.1:5000/api/list?start=11&limit=5",
   "results": [
     {
       "id": 6,

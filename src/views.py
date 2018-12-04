@@ -1,8 +1,9 @@
-from flask import Blueprint, request, jsonify, render_template
+from flask import Blueprint, request, jsonify, render_template, current_app
 
 from decouple import config
 from rq import Connection, Queue
 import redis
+import fakeredis
 
 try:
     from .models import db, PageWordCount
@@ -54,7 +55,12 @@ def index():
 
 @api_views.route("/tasks/<task_id>", methods=['GET', ])
 def task_details_view(task_id):
-    with Connection(redis.from_url(config('REDIS_URL'))):
+    if current_app.config["TESTING"]:
+        redis_instance = fakeredis.FakeStrictRedis()
+    else:
+        redis_instance = redis.from_url(config('REDIS_URL'))
+        
+    with Connection(redis_instance):
         queue = Queue()
         task = queue.fetch_job(task_id)
 

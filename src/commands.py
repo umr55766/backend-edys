@@ -1,7 +1,10 @@
 import click
 from flask.cli import with_appcontext
 
-from .models import  db
+try:
+    from .models import db, PageWordCount
+except ImportError:
+    from models import db, PageWordCount
 
 
 @click.command('initdb')

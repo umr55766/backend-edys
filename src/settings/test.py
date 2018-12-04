@@ -2,5 +2,6 @@ DEBUG=True
 SQLALCHEMY_DATABASE_URI='sqlite:///test.db'
 SQLALCHEMY_TRACK_MODIFICATIONS=False
 JSON_SORT_KEYS=False
-RQ_CONNECTION_CLASS='fakeredis.FakeStrictRedis'
+# RQ_CONNECTION_CLASS='fakeredis.FakeStrictRedis'
 TESTING = True
+RQ_ASYNC=False

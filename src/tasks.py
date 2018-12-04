@@ -1,7 +1,10 @@
 from flask_rq2 import RQ
 import requests
 
-from .models import db, PageWordCount
+try:
+    from .models import db, PageWordCount
+except ImportError:
+    from models import db, PageWordCount
 
 
 rq = RQ()

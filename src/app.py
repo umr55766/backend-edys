@@ -3,12 +3,9 @@ from flask import Flask, jsonify
 from decouple import config
 
 
-def create_app(TEST=False):
+def create_app():
     application = Flask(config("APPLICATION_NAME"))
-    if TEST:
-        application.config.from_pyfile("settings/test.py")
-    else:
-        application.config.from_pyfile(config("SETTINGS_FILE", "settings/local.py", cast=str))
+    application.config.from_pyfile(config("SETTINGS_FILE", "settings/local.py", cast=str))
 
     from .models import db, migrate
     db.init_app(application)

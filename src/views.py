@@ -4,10 +4,16 @@ from decouple import config
 from rq import Connection, Queue
 import redis
 
-from .models import PageWordCount
-from .serializers import page_word_counts_serializer
-from .tasks import count_words_task
-from .utils import get_paginated_list, get_serialized_data
+try:
+    from .models import db, PageWordCount
+    from .serializers import page_word_counts_serializer
+    from .tasks import count_words_task
+    from .utils import get_paginated_list, get_serialized_data
+except ImportError:
+    from models import db, PageWordCount
+    from serializers import page_word_counts_serializer
+    from tasks import count_words_task
+    from utils import get_paginated_list, get_serialized_data
 
 api_views = Blueprint('api', __name__, url_prefix='/api')
 html_views = Blueprint('html', __name__)

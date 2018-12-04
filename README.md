@@ -41,6 +41,8 @@
 - First we need to start the redis [`redis-server`]
 - Then start rqworker which will consume the queued tasks and process them [`flask rq worker`]
 
+#### Once server and worker is up and running, navigate to http://127.0.0.1:5000/
+
 
 **Libraries used and purpose**
 - flask-sqlalchemy : ORM
